@@ -29,12 +29,9 @@ jobs:
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: |
-            platform-tools
-            platforms;android-35
-            ndk;27.2.12479018
+          packages: platform-tools,platforms;android-35,ndk;27.2.12479018
 
-      - name: Check cargo-ndk options
+      - name: Install cargo-ndk
         run: |
           cargo install cargo-ndk --locked
           cargo ndk --help
@@ -42,6 +39,6 @@ jobs:
       - name: Show project files
         run: |
           ls -la
-          find . -maxdepth 5 \
+          find . -maxdepth 6 \
             \( -name gradlew -o -name prepare-alvr-deps.sh \) \
             -print
