@@ -184,19 +184,31 @@ dependencies {
 
 // The dependencies for NDK builds live inside the .aar files so they need to
 // be extracted before NDK targets can link against.
-task extractNdk(type: Copy)  {
-    copy {
-        from zipTree("../cardboard/cardboard-sdk.aar")
-        into "libraries/"
-        include "jni/**/libGfxPluginCardboard.so"
-    }
-    if (file("../gvr-android-sdk-1.200/libraries/sdk-base-1.200.0.aar").exists()) {
-        copy {
-            from zipTree("../gvr-android-sdk-1.200/libraries/sdk-base-1.200.0.aar")
-            into "libraries_gvr/"
-            include "headers/vr/gvr/capi/**/*h"
-            include "jni/**/libgvr_audio.so"
-            include "jni/**/libgvr.so"
+
+task extractNdk {
+    doLast {
+        def isNoGvr = gradle.startParameter.taskNames.any {
+            it.toLowerCase().contains("nogvr")
+        }
+
+        if (!isNoGvr) {
+            copy {
+                from zipTree("../cardboard/cardboard-sdk.aar")
+                into "libraries/"
+                include "jni/**/libGfxPluginCardboard.so"
+            }
+        } else {
+            println "[PVR] NoGvr build: skipping Cardboard native SDK extraction"
+        }
+
+        if (file("../gvr-android-sdk-1.200/libraries/sdk-base-1.200.0.aar").exists()) {
+            copy {
+                from zipTree("../gvr-android-sdk-1.200/libraries/sdk-base-1.200.0.aar")
+                into "libraries_gvr/"
+                include "headers/vr/gvr/capi/**/*h"
+                include "jni/**/libgvr_audio.so"
+                include "jni/**/libgvr.so"
+            }
         }
     }
 }
