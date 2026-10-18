@@ -10,20 +10,33 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-22.04
+
     steps:
       - name: Check out source
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
-          cache: gradle
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Android NDK
+        uses: android-actions/setup-android@v3
+
+      - name: Check cargo-ndk options
+        run: |
+          cargo install cargo-ndk --locked
+          cargo ndk --help
 
       - name: Show project files
         run: |
-          echo "Root files:"
           ls -la
-          echo "Build files:"
-          find . -maxdepth 3 \( -name gradlew -o -name settings.gradle -o -name settings.gradle.kts -o -name build.gradle -o -name build.gradle.kts -o -name prepare-alvr-deps.sh \) -print
+          find . -maxdepth 5 \
+            \( -name gradlew -o -name prepare-alvr-deps.sh \) \
+            -print
